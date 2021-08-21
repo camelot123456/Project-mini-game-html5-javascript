@@ -5,6 +5,10 @@ const c = canvas.getContext('2d');
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
+const scoreEl = document.querySelector('#scoreEl');
+const startGameBtn = document.querySelector('#startGameBtn');
+const modalEl = document.querySelector('#modalEl');
+const bigScoreEl = document.querySelector('#bigScoreEl');
 //------------------------------------------------------------------------------
 
 class Player {
@@ -105,10 +109,20 @@ class Pacticle {
 const x = canvas.width / 2;
 const y = canvas.height / 2;
 
-const player = new Player(x, y, 20, 'white');
-const projectiles = [];
-const enemies = [];
-const particles = [];
+let player = new Player(x, y, 20, 'white');
+let projectiles = [];
+let enemies = [];
+let particles = [];
+let score = 0;
+
+function init() {
+    player = new Player(x, y, 20, 'white');
+    projectiles = [];
+    enemies = [];
+    particles = [];
+    score = 0;
+    scoreEl.innerHTML = score;
+}
 
 function spawnEemies() {
     setInterval(() => {
@@ -137,6 +151,7 @@ function spawnEemies() {
 }
 
 let animationId;
+
 function animate() {
     animationId = requestAnimationFrame(animate);
     c.fillStyle = 'rgba(0, 0, 0, 0.1)';
@@ -170,8 +185,13 @@ function animate() {
             player.x - enemy.x,
             player.y - enemy.y
         );
+
+
+        //end game
         if (dist - enemy.radius - player.radius < 1) {
             cancelAnimationFrame(animationId);
+            modalEl.style.display = 'flex';
+            bigScoreEl.innerHTML = score;
         }
 
         projectiles.forEach((projectile, projectileIndex) => {
@@ -197,6 +217,11 @@ function animate() {
 
                 }
                 if (enemy.radius - 10 > 5) {
+                    //increase our score
+
+                    score += 100;
+                    scoreEl.innerHTML = score;
+
                     gsap.to(enemy, {
                         radius: enemy.radius - 10
                     })
@@ -204,6 +229,11 @@ function animate() {
                         projectiles.splice(projectileIndex, 1);
                     }, 0)
                 } else {
+                    //increase our score
+
+                    score += 250;
+                    scoreEl.innerHTML = score;
+
                     setTimeout(() => {
                         enemies.splice(index, 1);
                         projectiles.splice(projectileIndex, 1);
@@ -236,5 +266,9 @@ addEventListener('click', (event) => {
     )
 })
 
-animate();
-spawnEemies()
+startGameBtn.addEventListener('click', ()=>{
+    init();
+    animate();
+    spawnEemies();
+    modalEl.style.display = 'none';
+})
