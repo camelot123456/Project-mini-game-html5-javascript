@@ -78,4 +78,6 @@ function update() {
 }
 
 ball = new Ball(2, 2, 15);
+
+
 setInterval('update()', 5)
