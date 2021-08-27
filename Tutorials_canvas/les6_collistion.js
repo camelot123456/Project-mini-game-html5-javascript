@@ -26,13 +26,13 @@ function Rect(x, y, width, height) {
     }
 
     this.collision_ball = function (ball) {
-        // return (
-        //     Math.hypot(this.x - ball.x, this.y - ball.y) < ball.radius //&&
-        //     Math.hypot((this.x + this.width) - ball.x, this.y - ball.y) < ball.radius &&
-        //     Math.hypot(this.x -ball.x, (this.y + this.height) - ball.y) < ball.radius &&
-        //     Math.hypot((this.x + this.width) - ball.x, (this.y + this.height) - ball.y) < ball.radius
-        // );
-
+        var dx = ball.x;
+        var dy = ball.y;
+        if (dx < this.x) dx = this.x;
+        else if (dx > this.x + this.width) dx = this.x + this.width;
+        if (dy < this.y) dy = this.y;
+        else if (dy > this.y + this.height) dy = this.y + this.height;
+        return Math.hypot(dx - ball.x, dy - ball.y) <= ball.radius
     }
 }
 
@@ -60,10 +60,30 @@ function Ball(x, y, radius) {
         else if(px > rect.x + rect.width) px = rect.x + rect.width;
         if(py < rect.y) py = rect.y;
         else if(py > rect.y + rect.height) py = rect.y + rect.height;
-
         var dx = this.x - px
         var dy = this.y - py
-        return (dx*dx + dy*dy) <= this.radius * this.radius;
+        return (dx*dx + dy*dy) <= this.radius*this.radius;
+    }
+}    
+
+function Line(sx, sy, ex, ey){
+    this.sx = sx;
+    this.sy = sy;
+    this.ex = ex;
+    this.ey = ey;
+
+    this.draw = function () {
+        c.beginPath();
+        c.moveTo(this.sx, this.sy);
+        c.lineTo(this.ex, this.ey);
+        c.stroke();
+    }
+
+    this.collistion = function (x, y) {
+        var dx = Math.hypot(x - this.sx, y - this.sy);
+        var dy = Math.hypot(x - this.ex, y - this.ey);
+        var _line = Math.hypot(this.sx - this.ex, this.sy - this.ey);
+        return _line == dx + dy;
     }
 }
 
@@ -77,8 +97,10 @@ addEventListener('mousemove', (e) => {
 var rect1 = new Rect(200, 200, 100, 100)
 var rect2 = new Rect(canvas.width / 2, canvas.height / 2, 100, 100)
 
-var ball1 = new Ball(200, 200, 100);
+var ball1 = new Ball(200, 70, 70);
 var ball2 = new Ball(canvas.width / 2, canvas.height / 2, 100)
+
+var line1 = new Line(100, 100, 500, 500);
 
 function animate() {
     requestAnimationFrame(animate);
@@ -86,12 +108,13 @@ function animate() {
     // rect1.x = mouse.x
     // rect1.y = mouse.y
     // rect1.draw();
-    rect2.draw();
+    // rect2.draw();
     ball1.x = mouse.x
     ball1.y = mouse.y
     ball1.draw();
     // ball2.draw();
-    console.log(ball1.collision_rect(rect2));
+    line1.draw();
+    console.log(line1.collistion(ball1.x, ball1.y));
 }
 
 animate();
