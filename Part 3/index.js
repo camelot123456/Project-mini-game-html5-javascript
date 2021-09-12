@@ -26,6 +26,6 @@ function animate(){
     }
 }
 
-run(30);
+run(20);
 
 
